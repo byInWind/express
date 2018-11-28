@@ -1,0 +1,19 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #[em 本地图书馆], 一个非常基本的Express网站，作为Mozilla开发者网络上的教程示例而开发.
+
+  h1 动态内容
+
+  if error
+    p Error getting dynamic content.
+  else
+    p 该图书馆现在现在具有以下记录数:
+
+    ul
+      li #[strong 书:] !{data.book_count}
+      li #[strong 副本:] !{data.book_instance_count}
+      li #[strong 可用副本:] !{data.book_instance_available_count}
+      li #[strong 作者:] !{data.author_count}
+      li #[strong 种类:] !{data.genre_count}
