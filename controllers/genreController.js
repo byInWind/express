@@ -73,8 +73,7 @@ exports.genre_create_post = [
             // There are errors. Render the form again with sanitized values/error messages.
             res.render('genre_form', {title: 'Create Genre', genre: genre, errors: errors.array()});
             return;
-        }
-        else {
+        } else {
             // Data from form is valid.
             // Check if Genre with same name already exists.
             Genre.findOne({'name': req.body.name})

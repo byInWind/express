@@ -11,7 +11,7 @@ html(lang='en')
   body
     div(class='container-fluid')
       div(class='row')
-        div(class='col-sm-2')
+        div(class='col-sm-3')
           block sidebar
             ul(class='sidebar-nav')
               li
@@ -33,7 +33,7 @@ html(lang='en')
               li
                 a(href='/catalog/book/create') Create new book
               li
-                a(href='/catalog/bookinstance/create') Create new book instance (copy)
+                a(href='/catalog/bookinstance/create') Create new bookinstance (copy)
 
-        div(class='col-sm-10')
+        div(class='col-sm-9')
           block content
