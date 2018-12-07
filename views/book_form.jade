@@ -28,9 +28,29 @@ block content
                     div(style='display: inline; padding-right:10px;')
                         input.checkbox-input(type='checkbox', name='genre', id=genre._id, value=genre._id, checked=genre.checked )
                         label(for=genre._id) #{genre.name}
+        div.form-group
+            label(for='author') Author:
+            select#author.form-control(type='select' placeholder='Select author' name='author' required='true' )
+                for author in authors
+                    if book
+                        //- Handle GET form, where book.author is an object, and POST form, where it is a string.
+                        option(
+                        value=author._id
+                        selected=(
+                            author._id.toString() == book.author._id
+                            || author._id.toString() == book.author
+                        ) ? 'selected' : false
+                        ) #{author.name}
+                    else
+                        option(value=author._id) #{author.name}
         button.btn.btn-primary(type='submit') Submit
 
     if errors
         ul
             for error in errors
                 li!= error.msg
+    hr
+        p
+            a(href=book.url + '/delete') Delete Book
+        p
+            a(href=book.url + '/update') Update Book
