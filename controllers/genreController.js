@@ -4,7 +4,7 @@ var async = require('async');
 const {body, validationResult} = require('express-validator/check');
 const {sanitizeBody} = require('express-validator/filter');
 
-// Display list of all Genre.
+// Display list of all Genre. 
 exports.genre_list = function (req, res) {
     Genre.find()
         .exec(function (err, genre_list) {
