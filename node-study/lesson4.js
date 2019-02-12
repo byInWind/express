@@ -20,7 +20,7 @@ app.get('/', function (req, res) {
             if (err) {
                 throw new error(err)
             }
-            var arr = []
+            var arr = [] 
             var $ = cheerio.load(_res.text)
             $('#topic_list .cell').each(function (i, item) {
                 //url.resolve  不懂....
