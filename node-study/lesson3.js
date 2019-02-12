@@ -1,4 +1,10 @@
-//当在浏览器中访问 http://localhost:3000/ 时，输出 CNode(https://cnodejs.org/ ) 社区首页的所有帖子标题和链接,加上时间，以 json 的形式。
+/*
+* 当在浏览器中访问 http://localhost:3000/ 时，
+* 输出 CNode(https://cnodejs.org/ ) 社区首页的所有帖子标题和链接,时间，以 json 的形式。
+* 学习使用 superagent 抓取网页
+学习使用 cheerio 分析网页
+* 待扩展-------下载音乐，小说？
+* */
 
 const express = require('express')
 const superagent = require('superagent')
@@ -28,7 +34,7 @@ app.get('/', function (req, res, next) {
                 });
             });
 
-            res.send(items);
+            res.json(items);
         });
 });
 app.listen(3000,function () {
