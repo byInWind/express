@@ -13,6 +13,9 @@ var app = express()
 var url = require('url')
 
 var cnodeUrl = 'https://cnodejs.org'
+//为了访问速度，只取5条 ,,,,,实验发现快了很多
+var num = 0
+var maxNum = 5
 
 app.get('/', function (req, res) {
     superagent.get(cnodeUrl)
@@ -23,6 +26,10 @@ app.get('/', function (req, res) {
             var arr = []
             var $ = cheerio.load(sres.text)
             $('#topic_list .cell').each(function (i, item) {
+                num++;
+                if (num > 5) {
+                    return
+                }
                 //url.resolve  不懂....
                 // var href = url.resolve(cnodeUrl, $(item).find('.topic_title').attr('href')
                 var href = cnodeUrl + $(item).find('.topic_title').attr('href')
@@ -32,9 +39,9 @@ app.get('/', function (req, res) {
             // 得到一个 eventproxy 的实例
             var ep = new eventproxy();
 
-            // 命令 ep 重复监听 arr.length 次（在这里也就是 40 次） `topic_html` 事件再行动
-            ep.after('topic_html', 1, function (topics) {
-                // topics 不是arr，是包含了 arr.length 次 ep.emit('topic_html', pair) 中的那 40 个 值
+            // 命令 ep 重复监听 arr.length 次（在这里也就是 5 次） `topic_html` 事件再行动
+            ep.after('topic_html', arr.length, function (topics) {
+                // topics 不是arr，是包含了 arr.length 次 ep.emit('topic_html', pair) 中的那 5 个 值
                 // 开始行动   map 类似与each
 
                 topics = topics.map(function (topicPair) {
@@ -54,7 +61,7 @@ app.get('/', function (req, res) {
             });
             //重复5次发送请求,获取原始内容(html)
 
-            arr.slice(0, 1).forEach(function (topicUrl) {
+            arr.forEach(function (topicUrl) {
                 superagent.get(topicUrl)
                     .end(function (err, res) {
                         // console.log('fetch ' + topicUrl + ' successful');
@@ -62,7 +69,7 @@ app.get('/', function (req, res) {
                     });
             });
         })
-}); 
+});
 
 app.listen(3000, function () {
     console.log('success')
