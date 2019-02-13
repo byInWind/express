@@ -1,6 +1,6 @@
 /*
 *与4类似，抓取改为 插件async，使每次抓取3个
-* ?????巨慢，不太对    mapLimit等第三个参数函数里提供了两个参数，用自己写的访问结果巨慢，系统提供的快很多
+* ?????巨慢，不太对    mapLimit等第三个参数函数里提供了两个参数，用自己写的访问结果巨慢，系统提供的快很多 
 **/
 var express = require('express')
 var async = require('async')
