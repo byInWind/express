@@ -27,7 +27,7 @@ app.get('/', function (req, res) {
             var $ = cheerio.load(sres.text)
             $('#topic_list .cell').each(function (i, item) {
                 num++;
-                if (num > 5) {
+                if (num > maxNum) {
                     return
                 }
                 //url.resolve  不懂....
