@@ -64,7 +64,7 @@ app.get('/', function (req, res) {
                         href: topicUrl,
                         comment1: $('.reply_content').eq(0).text().trim(),
                     });
-                });
+                }); 
 
                 res.send(value)
             })
