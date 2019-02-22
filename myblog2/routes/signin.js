@@ -29,7 +29,7 @@ router.post('/', checkNotLogin, function (req, res, next) {
     }
 
     UserModel.getUserByName(name)
-        .then(function (err,user) {
+        .exec(function (user) {
             if (!user) {
                 req.flash('error', '用户不存在')
                 return res.redirect('back')
@@ -46,7 +46,6 @@ router.post('/', checkNotLogin, function (req, res, next) {
             // 跳转到主页
             res.redirect('/blog')
         })
-        .catch(next)
 })
 
 module.exports = router
