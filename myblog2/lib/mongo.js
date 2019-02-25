@@ -1,18 +1,19 @@
 const config = require('config-lite')(__dirname)
 const mongoose = require('mongoose')
-const Schema = mongoose.Schema()
-mongoose.connect(config.mongodb, {config: {autoIndex: false}})
+const Schema = mongoose.Schema
+mongoose.connect(config.mongodb, {autoIndex: false, useNewUrlParser: true})
 
-exports.User = mongoose.model('User', {
+var UserSchema = new Schema({
     name: {type: 'string', required: true},
     password: {type: 'string', required: true},
     avatar: {type: 'string', required: false},
     gender: {type: 'string', enum: ['m', 'f', 'x'], default: 'x'},
     bio: {type: 'string', required: true}
-})
+});
+UserSchema.index({name: 1}, {unique: true});
+exports.User = mongoose.model('User', UserSchema);
 
-exports.User.index({name: 1}, {unique: true})
-//.exec()// 1与-1是升序降序规则  根据用户名找到用户，用户名全局唯一
+//// 1与-1是升序降序规则  根据用户名找到用户，用户名全局唯一
 
 // const moment = require('moment')
 // const objectIdToTimestamp = require('objectid-to-timestamp')
