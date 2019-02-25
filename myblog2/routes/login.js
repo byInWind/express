@@ -20,7 +20,7 @@ router.post('/', checkNotLogin, function (req, res, next) {
     const avatar = req.files.avatar.path.split(path.sep).pop()
     let password = req.fields.password
     const repassword = req.fields.repassword
-
+ 
     // 校验参数
     try {
         if (!(name.length >= 1 && name.length <= 10)) {
