@@ -1,21 +1,25 @@
 const express = require('express')
 const router = express.Router()
-const BlogModel = require('../models/blog')
-const CommentModel = require('../models/comments')
+const BlogModel = require('../lib/mongo').Blog
+// const CommentModel = require('../models/comments')
 
 const checkLogin = require('../middlewares/check').checkLogin
 
 // GET /blog 所有用户或者特定用户的文章页
 //   eg: GET /blog?author=xxx
 router.get('/', function (req, res, next) {
-    const author = req.query.author
-    BlogModel.getBlogs(author)
-        .then(function (blog) {
-            res.render('blog', {
-                blog: blog
-            })
+    const author = req.query.author;
+    BlogModel.find({author: author})
+        .limit(5)
+        .exec(function (err, blog) {
+            if (blog) {
+                res.render('blog', {
+                    blog: blog
+                })
+            } else {
+                res.render('blog')
+            }
         })
-        .catch(next)
 })
 
 
@@ -24,7 +28,7 @@ router.post('/create', checkLogin, function (req, res, next) {
     const author = req.session.user._id
     const title = req.fields.title
     const content = req.fields.content
-
+    console.log('author ====' + author)
     // 校验参数
     try {
         if (!title.length) {
@@ -44,15 +48,14 @@ router.post('/create', checkLogin, function (req, res, next) {
         content: content
     }
 
-    BlogModel.create(blog)
-        .then(function (result) {
-            // 此 blog 是插入 mongodb 后的值，包含 _id
-            blog = result.ops[0]
-            req.flash('success', '发表成功')
-            // 发表成功后跳转到该文章页
-            res.redirect(`/blog/${blog._id}`)
-        })
-        .catch(next)
+    BlogModel.create(blog, function (err, result) {
+        // 此 blog 是插入 mongodb 后的值，包含 _id
+        console.log("result===" + result)
+        blog = result
+        req.flash('success', '发表成功')
+        // 发表成功后跳转到该文章页
+        res.redirect(`/blog/${blog._id}`)
+    })
 })
 
 // GET /blog/create 发表文章页
@@ -63,25 +66,44 @@ router.get('/create', checkLogin, function (req, res, next) {
 // GET /blog/:blogId 单独一篇的文章页
 router.get('/:blogId', function (req, res, next) {
     const blogId = req.params.blogId
-
-    Promise.all([
-        BlogModel.getBlogById(blogId), // 获取文章信息
-        CommentModel.getComments(blogId), // 获取该文章所有留言
-        BlogModel.incPv(blogId)// pv 加 1
-    ])
-        .then(function (result) {
-            const blog = result[0]
-            const comments = result[1]
-            if (!blog) {
-                throw new Error('该文章不存在')
-            }
-
+    console.log('blogId is   ' + blogId)
+    // Promise.all([
+    BlogModel.findOne({_id: blogId}, function (err, blog) {
+        console.log('blog is   ' + blog)
+        if (err) {
+            throw new Error(err)
+        }
+        if (blog) {
             res.render('blog_details', {
                 blog: blog,
-                comments: comments
+                // comments: comments
             })
-        })
-        .catch(next)
+        } else {
+            throw new Error('该文章不存在')
+        }
+
+    }) // 获取文章信息
+    // CommentModel.getComments(blogId), // 获取该文章所有留言
+    // BlogModel.methods.incPv = function (blogId) {  // pv 加 1
+    //     BlogModel.updateOne({pv: 1})
+    // }
+    // ])
+    // .then(function (result) {
+    //     console.log(result)
+    //     const blog = result[0]
+    //     // const comments = result[1]
+    //     if (!blog) {
+    //         throw new Error('该文章不存在')
+    //     }
+    //
+    //     res.render('blog_details', {
+    //         blog: blog,
+    //         // comments: comments
+    //     })
+    // })
+    // .catch(function () {
+    //     console.log('rtuiioi11111111')
+    // })
 })
 
 // GET /blog/:blogId/edit 更新文章页

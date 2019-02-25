@@ -5,7 +5,7 @@ module.exports = function (app) {
     app.use('/login', require('./login'))
     app.use('/signin', require('./signin'))
     app.use('/logout', require('./logout'))
-    // app.use('/blog', require('./blog'))
+    app.use('/blog', require('./blog'))
     // app.use('/comments', require('./comments'))
     app.use('/asdf', require('./asdf'))
     // 404 page

@@ -76,3 +76,11 @@ a:hover {
 .blog-content .tag.right a {
     color: #999;
 }
+
+.del_comment{
+    cursor: pointer;
+}
+
+body .ui.comments .comment{
+    padding: 0;
+}

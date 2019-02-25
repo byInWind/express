@@ -33,14 +33,15 @@ exports.User = mongoose.model('User', UserSchema);
 //         return result
 //     }
 // })
-// exports.Blog = mongolass.model('Blog', {
-//     author: {type: Mongolass.Types.ObjectId, required: true},
-//     title: {type: 'string', required: true},
-//     content: {type: 'string', required: true},
-//     pv: {type: 'number', default: 0}
-// })
-// exports.Blog.index({author: 1, _id: -1}).exec()// 按创建时间降序查看用户的文章列表
-//
+var BlogSchema = new Schema({
+    author: {type: Schema.Types.ObjectId, required: true},
+    title: {type: 'string', required: true},
+    content: {type: 'string', required: true},
+    pv: {type: 'number', default: 0}
+});
+BlogSchema.index({name: 1}, {unique: true});
+exports.Blog = mongoose.model('Blog', BlogSchema);
+
 // exports.Comment = mongolass.model('Comment', {
 //     author: {type: Schema.Types.ObjectId, required: true},
 //     content: {type: 'string', required: true},

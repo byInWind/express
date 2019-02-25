@@ -1,42 +1,42 @@
 const marked = require('marked')
 const Blog = require('../lib/mongo').Blog
-const CommentModel = require('./comments')
+// const CommentModel = require('./comments')
 
 // 给 blog 添加留言数 commentsCount
-Blog.plugin('addCommentsCount', {
-    afterFind: function (blogs) {
-        return Promise.all(blogs.map(function (blog) {
-            return CommentModel.getCommentsCount(blog._id).then(function (commentsCount) {
-                blog.commentsCount = commentsCount
-                return blog
-            })
-        }))
-    },
-    afterFindOne: function (blog) {
-        if (blog) {
-            return CommentModel.getCommentsCount(blog._id).then(function (count) {
-                blog.commentsCount = count
-                return blog
-            })
-        }
-        return blog
-    }
-})
+// Blog.plugin('addCommentsCount', {
+//     afterFind: function (blogs) {
+//         return Promise.all(blogs.map(function (blog) {
+//             return CommentModel.getCommentsCount(blog._id).then(function (commentsCount) {
+//                 blog.commentsCount = commentsCount
+//                 return blog
+//             })
+//         }))
+//     },
+//     afterFindOne: function (blog) {
+//         if (blog) {
+//             return CommentModel.getCommentsCount(blog._id).then(function (count) {
+//                 blog.commentsCount = count
+//                 return blog
+//             })
+//         }
+//         return blog
+//     }
+// })
 // 将 blog 的 content 从 markdown 转换成 html
-Blog.plugin('contentToHtml', {
-    afterFind: function (blogs) {
-        return blogs.map(function (blog) {
-            blog.content = marked(blog.content)
-            return blog
-        })
-    },
-    afterFindOne: function (blog) {
-        if (blog) {
-            blog.content = marked(blog.content)
-        }
-        return blog
-    }
-})
+// Blog.plugin('contentToHtml', {
+//     afterFind: function (blogs) {
+//         return blogs.map(function (blog) {
+//             blog.content = marked(blog.content)
+//             return blog
+//         })
+//     },
+//     afterFindOne: function (blog) {
+//         if (blog) {
+//             blog.content = marked(blog.content)
+//         }
+//         return blog
+//     }
+// })
 
 module.exports = {
     // 创建一篇文章
@@ -66,8 +66,6 @@ module.exports = {
             .find(query)
             .populate({path: 'author', model: 'User'})
             .sort({_id: -1})
-            .addCreatedAt()
-            .addCommentsCount()
             .contentToHtml()
             .exec()
     },
