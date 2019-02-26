@@ -77,11 +77,11 @@ module.exports = {
             .exec()
     },
     // 通过文章 id 获取一篇原生文章（编辑文章）
-    getRawBlogById: function getRawBlogById(blogId) {
+    getRawBlogById: function getRawBlogById(blogId,cb) {
         return Blog
             .findOne({_id: blogId})
             .populate({path: 'author', model: 'User'})
-            .exec()
+            .exec(cb)
     },
 
     // 通过文章 id 更新一篇文章

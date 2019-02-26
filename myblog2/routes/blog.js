@@ -66,9 +66,8 @@ router.get('/create', checkLogin, function (req, res, next) {
 // GET /blog/:blogId 单独一篇的文章页
 router.get('/:blogId', function (req, res, next) {
     const blogId = req.params.blogId
-    console.log('blogId is   ' + blogId)
     // Promise.all([
-    BlogModel.findOne({_id: blogId}, function (err, blog) {
+    BlogModel.findOneAndUpdate({_id: blogId},{$inc: {pv: 1}}, function (err, blog) {
         console.log('blog is   ' + blog)
         if (err) {
             throw new Error(err)
@@ -82,7 +81,8 @@ router.get('/:blogId', function (req, res, next) {
             throw new Error('该文章不存在')
         }
 
-    }) // 获取文章信息
+    })
+    // 获取文章信息
     // CommentModel.getComments(blogId), // 获取该文章所有留言
     // BlogModel.methods.incPv = function (blogId) {  // pv 加 1
     //     BlogModel.updateOne({pv: 1})
@@ -123,7 +123,6 @@ router.get('/:blogId/edit', checkLogin, function (req, res, next) {
                 blog: blog
             })
         })
-        .catch(next)
 })
 
 // Blog /blog/:blogId/edit 更新一篇文章
@@ -146,46 +145,46 @@ router.post('/:blogId/edit', checkLogin, function (req, res, next) {
         return res.redirect('back')
     }
 
-    BlogModel.getRawBlogById(blogId)
-        .then(function (blog) {
-            if (!blog) {
-                throw new Error('文章不存在')
-            }
-            if (blog.author._id.toString() !== author.toString()) {
-                throw new Error('没有权限')
-            }
-            BlogModel.updateBlogById(blogId, {title: title, content: content})
-                .then(function () {
-                    req.flash('success', '编辑文章成功')
-                    // 编辑成功后跳转到上一页
-                    res.redirect(`/blog/${blogId}`)
-                })
-                .catch(next)
-        })
+    BlogModel.findOne({_id: blogId}, function (blog) {
+        if (!blog) {
+            throw new Error('文章不存在')
+        }
+        if (blog.author._id.toString() !== author.toString()) {
+            throw new Error('没有权限')
+        }
+        BlogModel.updateBlogById(blogId, {title: title, content: content})
+            .then(function () {
+                req.flash('success', '编辑文章成功')
+                // 编辑成功后跳转到上一页
+                res.redirect(`/blog/${blogId}`)
+            })
+    })
 })
 
 // GET /blog/:blogId/remove 删除一篇文章
 router.get('/:blogId/remove', checkLogin, function (req, res, next) {
     const blogId = req.params.blogId
     const author = req.session.user._id
-
-    BlogModel.getRawBlogById(blogId)
-        .then(function (blog) {
-            if (!blog) {
-                throw new Error('文章不存在')
-            }
-            if (blog.author._id.toString() !== author.toString()) {
-                throw new Error('没有权限')
-            }
-
-            BlogModel.delBlogById(blogId, author)
-                .then(function () {
-                    req.flash('success', '删除文章成功')
-                    // 删除成功后跳转到主页
-                    res.redirect('/blog')
-                })
-                .catch(next)
-        })
+    BlogModel.findByIdAndDelete(blogId, function (err, blog) {
+        if (err) {
+            throw new Error(err)
+        }
+        if (!blog) {
+            throw new Error('文章不存在')
+        }
+        if (blog.author._id.toString() !== author.toString()) {
+            throw new Error('没有权限')
+        }
+        console.log('删除文章成功')
+        //
+        // BlogModel.delBlogById(blogId, author)
+        //     .then(function () {
+        //         req.flash('success', '删除文章成功')
+        //         // 删除成功后跳转到主页
+        //         res.redirect('/blog')
+        //     })
+        //     .catch(next)
+    })
 })
 
 module.exports = router
