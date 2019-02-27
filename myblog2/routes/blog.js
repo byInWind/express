@@ -4,7 +4,7 @@ const BlogModel = require('../lib/mongo').Blog
 // const CommentModel = require('../models/comments')
 
 const checkLogin = require('../middlewares/check').checkLogin
-
+ 
 // GET /blog 所有用户或者特定用户的文章页
 //   eg: GET /blog?author=xxx
 router.get('/', function (req, res, next) {
