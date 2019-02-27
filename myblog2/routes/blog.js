@@ -28,7 +28,6 @@ router.post('/create', checkLogin, function (req, res, next) {
     const author = req.session.user._id
     const title = req.fields.title
     const content = req.fields.content
-    console.log('author ====' + author)
     // 校验参数
     try {
         if (!title.length) {
@@ -50,7 +49,6 @@ router.post('/create', checkLogin, function (req, res, next) {
 
     BlogModel.create(blog, function (err, result) {
         // 此 blog 是插入 mongodb 后的值，包含 _id
-        console.log("result===" + result)
         blog = result
         req.flash('success', '发表成功')
         // 发表成功后跳转到该文章页
@@ -67,8 +65,7 @@ router.get('/create', checkLogin, function (req, res, next) {
 router.get('/:blogId', function (req, res, next) {
     const blogId = req.params.blogId
     // Promise.all([
-    BlogModel.findOneAndUpdate({_id: blogId},{$inc: {pv: 1}}, function (err, blog) {
-        console.log('blog is   ' + blog)
+    BlogModel.findOneAndUpdate({_id: blogId}, {$inc: {pv: 1}}, function (err, blog) {
         if (err) {
             throw new Error(err)
         }
@@ -110,19 +107,17 @@ router.get('/:blogId', function (req, res, next) {
 router.get('/:blogId/edit', checkLogin, function (req, res, next) {
     const blogId = req.params.blogId
     const author = req.session.user._id
-
-    BlogModel.getRawBlogById(blogId)
-        .then(function (blog) {
-            if (!blog) {
-                throw new Error('该文章不存在')
-            }
-            if (author.toString() !== blog.author._id.toString()) {
-                throw new Error('权限不足')
-            }
-            res.render('blog_edit', {
-                blog: blog
-            })
+    BlogModel.findOne({_id: blogId}, function (err, blog) {
+        if (!blog) {
+            throw new Error('该文章不存在')
+        }
+        if (author.toString() !== blog.author._id.toString()) {
+            throw new Error('权限不足')
+        }
+        res.render('blog_edit', {
+            blog: blog
         })
+    })
 })
 
 // Blog /blog/:blogId/edit 更新一篇文章
@@ -131,7 +126,6 @@ router.post('/:blogId/edit', checkLogin, function (req, res, next) {
     const author = req.session.user._id
     const title = req.fields.title
     const content = req.fields.content
-
     // 校验参数
     try {
         if (!title.length) {
@@ -144,20 +138,19 @@ router.post('/:blogId/edit', checkLogin, function (req, res, next) {
         req.flash('error', e.message)
         return res.redirect('back')
     }
-
-    BlogModel.findOne({_id: blogId}, function (blog) {
+    BlogModel.findOneAndUpdate(blogId, {title: title, content: content}, function (err, blog) {
+        if (err) {
+            throw new Error(err)
+        }
         if (!blog) {
             throw new Error('文章不存在')
         }
         if (blog.author._id.toString() !== author.toString()) {
             throw new Error('没有权限')
         }
-        BlogModel.updateBlogById(blogId, {title: title, content: content})
-            .then(function () {
-                req.flash('success', '编辑文章成功')
-                // 编辑成功后跳转到上一页
-                res.redirect(`/blog/${blogId}`)
-            })
+        req.flash('success', '编辑文章成功')
+        // 编辑成功后跳转到上一页
+        res.redirect(`/blog/${blogId}`)
     })
 })
 
