@@ -8,10 +8,11 @@ const checkLogin = require('../middlewares/check').checkLogin
 // GET /blog 所有用户或者特定用户的文章页
 //   eg: GET /blog?author=xxx
 router.get('/', function (req, res, next) {
-    const author = req.query.author;
-    BlogModel.find({author: author})
+    // 为空即查询所有
+    BlogModel.find({})
         .limit(5)
         .exec(function (err, blog) {
+            console.log(blog)
             if (blog) {
                 res.render('blog', {
                     blog: blog
