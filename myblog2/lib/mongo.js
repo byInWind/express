@@ -42,9 +42,10 @@ var BlogSchema = new Schema({
 BlogSchema.index({name: 1}, {unique: true});
 exports.Blog = mongoose.model('Blog', BlogSchema);
 
-// exports.Comment = mongolass.model('Comment', {
-//     author: {type: Schema.Types.ObjectId, required: true},
-//     content: {type: 'string', required: true},
-//     blogId: {type: Schema.Types.ObjectId, required: true}
-// })
-// exports.Comment.index({blogId: 1, _id: 1}).exec()// 通过文章 id 获取该文章下所有留言，按留言创建时间升序
+var CommentSchema = new Schema({
+    author: {type: Schema.Types.ObjectId, required: true},
+    content: {type: 'string', required: true},
+    blogId: {type: Schema.Types.ObjectId, required: true}
+});
+CommentSchema.index({blogId: 1});
+exports.Comment = mongoose.model('Comment', CommentSchema);

@@ -1,10 +1,10 @@
 const express = require('express')
 const router = express.Router()
 const BlogModel = require('../lib/mongo').Blog
-// const CommentModel = require('../models/comments')
+const CommentModel = require('../lib/mongo').Comment
 
 const checkLogin = require('../middlewares/check').checkLogin
- 
+
 // GET /blog 所有用户或者特定用户的文章页
 //   eg: GET /blog?author=xxx
 router.get('/', function (req, res, next) {
@@ -12,7 +12,6 @@ router.get('/', function (req, res, next) {
     BlogModel.find({})
         .limit(5)
         .exec(function (err, blog) {
-            console.log(blog)
             if (blog) {
                 res.render('blog', {
                     blog: blog
@@ -71,21 +70,34 @@ router.get('/:blogId', function (req, res, next) {
             throw new Error(err)
         }
         if (blog) {
-            res.render('blog_details', {
-                blog: blog,
-                // comments: comments
+            // 获取文章信息
+            CommentModel.find({blogId: blogId}, function (err, comments) {
+                if (err) {
+                    throw new Error(err)
+                }
+                console.log("xx=====  " + comments)
+                res.render('blog_details', {
+                    blog: blog,
+                    comments: comments
+                })
             })
+
         } else {
             throw new Error('该文章不存在')
         }
 
     })
-    // 获取文章信息
-    // CommentModel.getComments(blogId), // 获取该文章所有留言
+    // // 获取文章信息
+    // CommentModel.findById(blogId,function (err,xx) {
+    //     console.log(xx)
+    // }) // 获取该文章所有留言
     // BlogModel.methods.incPv = function (blogId) {  // pv 加 1
     //     BlogModel.updateOne({pv: 1})
     // }
+
     // ])
+
+
     // .then(function (result) {
     //     console.log(result)
     //     const blog = result[0]
