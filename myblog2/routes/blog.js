@@ -75,7 +75,7 @@ router.get('/:blogId', function (req, res, next) {
                 if (err) {
                     throw new Error(err)
                 }
-                console.log("xx=====  " + comments)
+                // console.log("xx=====  " + comments)
                 res.render('blog_details', {
                     blog: blog,
                     comments: comments

@@ -26,7 +26,7 @@ router.post('/', checkLogin, function (req, res, next) {
         content: content
     }
 
-    CommentModel.create(comment, function () {
+    CommentModel.create(comment, function (err, data) {
         req.flash('success', '留言成功')
         // 留言成功后跳转到上一页
         res.redirect('back')
@@ -38,7 +38,7 @@ router.get('/:commentId/remove', checkLogin, function (req, res, next) {
     const commentId = req.params.commentId
     const author = req.session.user._id
 
-    CommentModel.findById(commentId, function (comment) {
+    CommentModel.findById(commentId, function (err, comment) {
         if (!comment) {
             throw new Error('留言不存在')
         }

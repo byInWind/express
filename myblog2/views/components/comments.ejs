@@ -8,7 +8,11 @@
                 <% comments.forEach(function (comment) { %>
                     <div class="comment">
             <span class="avatar">
-              <img src="/img/<%= comment.author.avatar %>">
+                <% if(comment.author.avatar) { %>
+                    <img class="avatar" src="/img/<%= comment.author.avatar %>">
+                <% } else{ %>
+                    <img class="avatar" src="/img/avatar.png">
+                <% } %>
             </span>
                         <div class="content">
                             <a class="author"

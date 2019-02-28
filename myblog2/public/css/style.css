@@ -77,10 +77,15 @@ a:hover {
     color: #999;
 }
 
-.del_comment{
+.del_comment {
     cursor: pointer;
 }
 
-body .ui.comments .comment{
+body .ui.comments .comment {
     padding: 0;
+}
+
+.ui.minimal.comments .comment .actions {
+    top: auto;
+    bottom: 0;
 }
