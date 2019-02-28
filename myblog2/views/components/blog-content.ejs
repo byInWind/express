@@ -22,7 +22,6 @@
                     <span class="tag right">
             <span>浏览(<%= blog.pv || 0 %>)</span>
             <span>留言(<%= blog.commentsCount || 0 %>)</span>
-
                         <% if (user && blog.author._id && user._id.toString() === blog.author._id.toString()) { %>
                             <div class="ui inline dropdown">
                 <div class="text"></div>

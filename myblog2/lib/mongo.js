@@ -34,7 +34,7 @@ exports.User = mongoose.model('User', UserSchema);
 //     }
 // })
 var BlogSchema = new Schema({
-    author: {type: Schema.Types.ObjectId, required: true},
+    author: {type: Schema.Types.ObjectId, ref: 'User', required: true},
     title: {type: 'string', required: true},
     content: {type: 'string', required: true},
     pv: {type: 'number', default: 0}

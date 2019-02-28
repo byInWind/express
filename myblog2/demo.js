@@ -58,16 +58,12 @@ author.save(function (err) {
         author: author._id    // assign the _id from the person
     });
 
-    story1.save(function (err) {
-        if (err) return handleError(err);
-        // thats it!
-        // console.log('xxxxxxxxx', story1)
-    });
+    story1.save();
 });
 Story.findOne({title: 'Casino Royale'})
     .populate('author')
     .exec(function (err, story) {
         if (err) return handleError(err);
-        console.log('The author is %s', story.author);
+        console.log('The author is %s', story);
         // prints "The author is Ian Fleming"
     });

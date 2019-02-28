@@ -5,11 +5,13 @@ const CommentModel = require('../lib/mongo').Comment
 
 const checkLogin = require('../middlewares/check').checkLogin
 
+//查询时无法关联到一起
 // GET /blog 所有用户或者特定用户的文章页
 //   eg: GET /blog?author=xxx
 router.get('/', function (req, res, next) {
     // 为空即查询所有
     BlogModel.find({})
+        .populate('author')
         .limit(5)
         .exec(function (err, blog) {
             if (blog) {
@@ -70,6 +72,7 @@ router.get('/:blogId', function (req, res, next) {
             throw new Error(err)
         }
         if (blog) {
+            console.log(blog)
             // 获取文章信息
             CommentModel.find({blogId: blogId}, function (err, comments) {
                 if (err) {
@@ -185,9 +188,10 @@ router.get('/:blogId/remove', checkLogin, function (req, res, next) {
         //
         // BlogModel.delBlogById(blogId, author)
         //     .then(function () {
-        //         req.flash('success', '删除文章成功')
-        //         // 删除成功后跳转到主页
-        //         res.redirect('/blog')
+        req.flash('success', '删除文章成功')
+        // 删除成功后跳转到主页
+        // res.redirect('')
+        res.location('back');
         //     })
         //     .catch(next)
     })
