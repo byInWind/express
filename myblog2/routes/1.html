@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<script>
+    var arr = [1, 2, 3, 4,]
+    var xx = arr.map(function (r) {
+        r = r + 1;
+        return r
+    });
+
+    new Promise((resolve, reject) => {
+        resolve(arr.map(function (r) {
+            r = r + 1;
+            return 5
+        }))
+    }).then((value) => {
+        console.log(value);
+    });
+</script>
+</body>
+</html>

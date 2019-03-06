@@ -1,4 +1,4 @@
-<%- include('header') %>
+<%- include('components/header') %>
 
 <div class="ui grid">
     <div class="four wide column">
@@ -6,7 +6,11 @@
            href="/blog?author=<%= user._id %>"
            data-title="<%= user.name %> | <%= ({m: '男', f: '女', x: '保密'})[user.gender] %>"
            data-content="<%= user.bio %>">
-            <img class="avatar" src="/img/<%= user.avatar %>">
+            <% if(user.avatar) { %>
+                <img class="avatar" src="/img/<%= user.avatar %>">
+            <% } else{ %>
+                <img class="avatar" src="/img/avatar.png">
+            <% } %>
         </a>
     </div>
 
@@ -25,4 +29,4 @@
     </div>
 </div>
 
-<%- include('footer') %>
+<%- include('components/footer') %>

@@ -2,21 +2,112 @@ const express = require('express')
 const router = express.Router()
 const BlogModel = require('../lib/mongo').Blog
 const CommentModel = require('../lib/mongo').Comment
+const marked = require('marked')
 
 const checkLogin = require('../middlewares/check').checkLogin
 
-//查询时无法关联到一起
-// GET /blog 所有用户或者特定用户的文章页
-//   eg: GET /blog?author=xxx
+// GET /blog 所有blog
 router.get('/', function (req, res, next) {
-    // 为空即查询所有
     BlogModel.find({})
-        .populate('author')
-        .limit(5)
-        .exec(function (err, blog) {
-            if (blog) {
+    // .populate('author')
+    // .limit(5)
+        .exec(function (err, blogs) {
+            if (blogs) {
+                //现在留言数为0，数据库里没有存留言数，手动计算留言数
+                //循环所有blog,为每个blog添加commentsCount属性,,待解决
+                // blogs.forEach(function (blog) {
+                //
+                // });
+                // Promise.all(blogs.map(function (blog) {
+                //     // return (
+                //         CommentModel.find({}, function (err, comments) {
+                //             blog.commentsCount = comments.length;
+                //         })
+                //     // )
+                // })).then(function (val) {
+                //   console.log('val is xxxxxx')
+                //     res.render('blog', {
+                //         blog: blogs
+                //     })
+                // });
+
+                // new Promise(function (resolve) {
+                //     var xxss = blogs.forEach(function (blog) {
+                //         CommentModel.find({}, function (err, comments) {
+                //             blog.commentsCount = comments.length
+                //             // console.log("comments is " + blog.commentsCount)
+                //             return blog
+                //         })
+                //     });
+                //     // var xxss =  blogs[0].commentsCount = 5;
+                //     // console.log('xxss', xxss)
+                //     resolve(xxss)
+                // }).then(function (val) {
+                //     console.log('val is ' + val)
+                //     res.render('blog', {
+                //         blog: blogs
+                //     })
+                // })
+                // console.log('enddddddddd')
                 res.render('blog', {
-                    blog: blog
+                    blog: blogs
+                })
+            } else {
+                res.render('blog')
+            }
+        })
+});
+// GET /blog/用户name 特定用户的文章页
+router.get('/:authorName', function (req, res, next) {
+    const author = req.path;
+    const query = {};
+    if (author != '/') {
+        query.author = author
+    }
+    // 为空('/')即查询所有
+    BlogModel.find(query)
+    // .populate('author')
+    // .limit(5)
+        .exec(function (err, blogs) {
+            if (blogs) {
+                //现在留言数为0，数据库里没有存留言数，手动计算留言数
+                //循环所有blog,为每个blog添加commentsCount属性,,待解决
+                // blogs.forEach(function (blog) {
+                //
+                // });
+                // Promise.all(blogs.map(function (blog) {
+                //     // return (
+                //         CommentModel.find({}, function (err, comments) {
+                //             blog.commentsCount = comments.length;
+                //         })
+                //     // )
+                // })).then(function (val) {
+                //   console.log('val is xxxxxx')
+                //     res.render('blog', {
+                //         blog: blogs
+                //     })
+                // });
+
+                // new Promise(function (resolve) {
+                //     var xxss = blogs.forEach(function (blog) {
+                //         CommentModel.find({}, function (err, comments) {
+                //             blog.commentsCount = comments.length
+                //             // console.log("comments is " + blog.commentsCount)
+                //             return blog
+                //         })
+                //     });
+                //     // var xxss =  blogs[0].commentsCount = 5;
+                //     // console.log('xxss', xxss)
+                //     resolve(xxss)
+                // }).then(function (val) {
+                //     console.log('val is ' + val)
+                //     res.render('blog', {
+                //         blog: blogs
+                //     })
+                // })
+                // console.log('enddddddddd')
+                res.render('blog', {
+                    blog: blogs
                 })
             } else {
                 res.render('blog')
@@ -24,9 +115,8 @@ router.get('/', function (req, res, next) {
         })
 })
 
-
 // Blog /blog/create 发表一篇文章
-router.post('/create', checkLogin, function (req, res, next) {
+router.post('/:authorName/create', checkLogin, function (req, res, next) {
     const author = req.session.user._id
     const title = req.fields.title
     const content = req.fields.content
@@ -54,7 +144,7 @@ router.post('/create', checkLogin, function (req, res, next) {
         blog = result
         req.flash('success', '发表成功')
         // 发表成功后跳转到该文章页
-        res.redirect(`/blog/${blog._id}`)
+        res.redirect(`/blog/${blog.author.name}/${blog._id}`)
     })
 })
 
@@ -64,7 +154,7 @@ router.get('/create', checkLogin, function (req, res, next) {
 })
 
 // GET /blog/:blogId 单独一篇的文章页
-router.get('/:blogId', function (req, res, next) {
+router.get('/:authorName/:blogId', function (req, res, next) {
     const blogId = req.params.blogId
     // Promise.all([
     BlogModel.findOneAndUpdate({_id: blogId}, {$inc: {pv: 1}}, function (err, blog) {
@@ -72,12 +162,18 @@ router.get('/:blogId', function (req, res, next) {
             throw new Error(err)
         }
         if (blog) {
-            console.log(blog)
             // 获取文章信息
             CommentModel.find({blogId: blogId}, function (err, comments) {
                 if (err) {
                     throw new Error(err)
                 }
+                //为每个blog添加commentsCount属性,待解决
+                blog.commentsCount = comments.length;
+                //转为marked语法
+                comments.map(function (comment) {
+                    comment.content = marked(comment.content)
+                    // return comment
+                })
                 // console.log("xx=====  " + comments)
                 res.render('blog_details', {
                     blog: blog,
@@ -184,16 +280,9 @@ router.get('/:blogId/remove', checkLogin, function (req, res, next) {
         if (blog.author._id.toString() !== author.toString()) {
             throw new Error('没有权限')
         }
-        console.log('删除文章成功')
-        //
-        // BlogModel.delBlogById(blogId, author)
-        //     .then(function () {
         req.flash('success', '删除文章成功')
         // 删除成功后跳转到主页
-        // res.redirect('')
         res.location('back');
-        //     })
-        //     .catch(next)
     })
 })
 

@@ -1,4 +1,4 @@
-<%- include('header') %>
+<%- include('components/header') %>
 <% if (blog.length >= 1) { %>
     <% blog.forEach(function (blog) { %>
         <%- include('components/blog-content', { blog: blog }) %>
@@ -10,4 +10,4 @@
     </section>
 <% } %>
 
-<%- include('footer') %>
+<%- include('components/footer') %>
