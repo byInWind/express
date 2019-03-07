@@ -29,41 +29,101 @@ mongoose.connect('mongodb://localhost:27017/test', {config: {autoIndex: false}})
 //     console.log('删除成功')
 // })
 
-const personSchema = new Schema({
-    _id: Schema.Types.ObjectId,
+// const personSchema = new Schema({
+//     name: String,
+//     age: Number,
+//     stories: [{type: Schema.Types.ObjectId, ref: 'Story'}]
+// });
+//
+// const storySchema = new Schema({
+//     author: {type: String, ref: 'Person'},
+//     title: String,
+//     fans: [{type: Schema.Types.ObjectId, ref: 'Person'}]
+// });
+//
+// const Story = mongoose.model('Story', storySchema);
+// const Person = mongoose.model('Person', personSchema);
+// const author = new Person({
+//     name: 'aa',
+//     age: 50,
+// });
+// const story1 = new Story({
+//     title: 'bbbbbbbb',
+//     author: author._id,    // assign the _id from the person
+//     fans: new mongoose.Types.ObjectId()
+// });
+//
+// // const story2 = new Story({
+// //     title: 'xxxx',
+// //     author: author._id,    // assign the _id from the person
+// //     fans: new mongoose.Types.ObjectId()
+// // });
+// story1.save(function (err) {
+//
+// });
+// // story2.save(function (err) {
+// //
+// // });
+// author.save(function (err) {
+//     console.log(111, author._id)
+//
+// });
+// //person寻找固定的人，再寻找所有的story，，，，找不到
+// // Person.findOne({name: 'aa'})
+// //     .populate('stories')
+// //     .exec(function (err, Storys) {
+// //         console.log('The Story is %s', Storys);
+// //         // prints "The author is Ian Fleming"
+// //     });
+// //story根据固定的人寻找，寻找到的是固定的人的所有story
+//
+//
+
+const authorSchema = Schema({
     name: String,
-    age: Number,
     stories: [{type: Schema.Types.ObjectId, ref: 'Story'}]
 });
 
-const storySchema = new Schema({
-    author: {type: Schema.Types.ObjectId, ref: 'Person'},
-    title: String,
-    fans: [{type: Schema.Types.ObjectId, ref: 'Person'}]
+const storySchema = Schema({
+    author: {type: Schema.Types.ObjectId, ref: 'Author'},
+    title: String
 });
 
 const Story = mongoose.model('Story', storySchema);
-const Person = mongoose.model('Person', personSchema);
-const author = new Person({
-    _id: new mongoose.Types.ObjectId(),
-    name: 'Ian Fleming',
-    age: 50
-});
+const Author = mongoose.model('Author', authorSchema);
+const wxm = new Author({name: '司马迁'});
 
-author.save(function (err) {
-    if (err) return handleError(err);
+wxm.save(function (err) {
+    if (err) {
+        return handleError(err);
+    }
 
+    // 现在库中有了作者司马迁，我们来新建一条简介
     const story1 = new Story({
-        title: 'Casino Royale',
-        author: author._id    // assign the _id from the person
+        title: "司马迁是历史学家1",
+        author: wxm._id    // author 设置为作者 司马迁 的 _id。ID 是自动创建的。
     });
+    const story2 = new Story({
+        title: "司马迁是历史学家2",
+        author: wxm._id    // author 设置为作者 司马迁 的 _id。ID 是自动创建的。
+    });
+    story1.save(function (err) {
+        if (err) {
+            return handleError(err);
+        }  // 司马迁有了一条简介
+        story2.save(function () {
+            Story
+                .find({author: wxm._id})
+                .exec(function (err, stories) {
+                    if (err) {
+                        return handleError(err);
+                    } // 返回所有 author 字段的值为 司马迁id 的简介
+                    console.log(wxm._id)
+                    console.log('stories is ' + stories)
+                });
+        })
 
-    story1.save();
-});
-Story.findOne({title: 'Casino Royale'})
-    .populate('author')
-    .exec(function (err, story) {
-        if (err) return handleError(err);
-        console.log('The author is %s', story);
-        // prints "The author is Ian Fleming"
     });
+});
+// Storyz
+

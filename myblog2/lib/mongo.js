@@ -8,7 +8,8 @@ var UserSchema = new Schema({
     password: {type: 'string', required: true},
     avatar: {type: 'string', required: false},
     gender: {type: 'string', enum: ['m', 'f', 'x'], default: 'x'},
-    bio: {type: 'string', required: true}
+    bio: {type: 'string', required: true},
+    blogs: [{type: Schema.Types.ObjectId, ref: 'Blog'}]
 });
 UserSchema.index({name: 1}, {unique: true});
 exports.User = mongoose.model('User', UserSchema);
