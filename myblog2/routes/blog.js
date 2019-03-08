@@ -295,4 +295,3 @@ router.get('/:blogId/remove', checkLogin, function (req, res, next) {
 })
 
 module.exports = router
- 
