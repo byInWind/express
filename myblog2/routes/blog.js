@@ -151,7 +151,7 @@ router.post('/:authorName/create', checkLogin, function (req, res, next) {
         title: title,
         content: content
     }
-
+ 
     BlogModel.create(blog, function (err, result) {
         // 此 blog 是插入 mongodb 后的值，包含 _id
         blog = result
