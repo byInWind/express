@@ -6,7 +6,7 @@ const CommentModel = require('../lib/mongo').Comment
 const marked = require('marked')
 
 const checkLogin = require('../middlewares/check').checkLogin
- 
+
 // GET /blog 所有blog
 router.get('/', function (req, res, next) {
     BlogModel.find({})
@@ -151,7 +151,7 @@ router.post('/:authorName/create', checkLogin, function (req, res, next) {
         title: title,
         content: content
     }
- 
+
     BlogModel.create(blog, function (err, result) {
         // 此 blog 是插入 mongodb 后的值，包含 _id
         blog = result
@@ -226,7 +226,7 @@ router.get('/:authorName/:blogId', function (req, res, next) {
 })
 
 // GET /blog/:blogId/edit 更新文章页
-router.get('/:blogId/edit', checkLogin, function (req, res, next) {
+router.get('/:authorName/:blogId/edit', checkLogin, function (req, res, next) {
     const blogId = req.params.blogId
     const author = req.session.user._id
     BlogModel.findOne({_id: blogId}, function (err, blog) {
@@ -243,11 +243,13 @@ router.get('/:blogId/edit', checkLogin, function (req, res, next) {
 })
 
 // Blog /blog/:blogId/edit 更新一篇文章
-router.post('/:blogId/edit', checkLogin, function (req, res, next) {
+router.post('/:authorName/:blogId/edit', checkLogin, function (req, res, next) {
+    const authorName = req.params.authorName
     const blogId = req.params.blogId
-    const author = req.session.user._id
+    const author = req.session.user.name
     const title = req.fields.title
     const content = req.fields.content
+    console.log(req.session.user)
     // 校验参数
     try {
         if (!title.length) {
@@ -260,24 +262,28 @@ router.post('/:blogId/edit', checkLogin, function (req, res, next) {
         req.flash('error', e.message)
         return res.redirect('back')
     }
-    BlogModel.findOneAndUpdate(blogId, {title: title, content: content}, function (err, blog) {
-        if (err) {
-            throw new Error(err)
-        }
-        if (!blog) {
-            throw new Error('文章不存在')
-        }
-        if (blog.author._id.toString() !== author.toString()) {
-            throw new Error('没有权限')
-        }
-        req.flash('success', '编辑文章成功')
-        // 编辑成功后跳转到上一页
-        res.redirect(`/blog/${blogId}`)
-    })
+    BlogModel.findOneAndUpdate({_id: blogId}, {title: title, content: content})
+        .populate('author')
+        .exec(function (err, blog) {
+            if (err) {
+                throw new Error(err)
+            }
+            if (!blog) {
+                throw new Error('文章不存在')
+            }
+            console.log(11, blog.author.name)
+            console.log(22, author)
+            if (blog.author.name.toString() !== author.toString()) {
+                throw new Error('没有权限')
+            }
+            req.flash('success', '编辑文章成功')
+            // 编辑成功后跳转到上一页
+            res.redirect(`/blog/${authorName}/${blogId}`)
+        })
 })
 
 // GET /blog/:blogId/remove 删除一篇文章
-router.get('/:blogId/remove', checkLogin, function (req, res, next) {
+router.get('/:authorName/:blogId/remove', checkLogin, function (req, res, next) {
     const blogId = req.params.blogId
     const author = req.session.user._id
     BlogModel.findByIdAndDelete(blogId, function (err, blog) {

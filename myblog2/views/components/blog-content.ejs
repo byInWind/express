@@ -2,7 +2,7 @@
     <div class="ui grid">
         <div class="four wide column">
             <a class="avatar avatar-link"
-               href="/blog?author=<%= blog.author._id %>"
+               href="/blog/<%= blog.author.name %>"
                data-title="<%= blog.author.name %> | <%= ({m: '男', f: '女', x: '保密'})[blog.author.gender] %>"
                data-content="<%= blog.author.bio %>">
                 <% if(blog.author.avatar) { %>
@@ -15,7 +15,6 @@
 
         <div class="eight wide column">
             <div class="ui segment">
-                <!--ssss-->
                 <h3><a href="/blog/<%= blog.author.name %>/<%= blog._id %>"><%= blog.title %></a></h3>
                 <pre><%- blog.content %></pre>
                 <div>
@@ -28,8 +27,8 @@
                 <div class="text"></div>
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                  <div class="item"><a href="/blog/<%= blog._id %>/edit">编辑</a></div>
-                  <div class="item"><a href="/blog/<%= blog._id %>/remove">删除</a></div>
+                  <div class="item"><a href="/blog/<%= blog.author.name %>/<%= blog._id %>/edit">编辑</a></div>
+                  <div class="item"><a href="/blog/<%= blog.author.name %>/<%= blog._id %>/remove">删除</a></div>
                 </div>
               </div>
                         <% } %>
