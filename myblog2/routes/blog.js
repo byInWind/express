@@ -10,8 +10,8 @@ const checkLogin = require('../middlewares/check').checkLogin
 // GET /blog 所有blog
 router.get('/', function (req, res, next) {
     BlogModel.find({})
-    // .populate('author')
-    // .limit(5)
+        .populate('author')
+        // .limit(5)
         .exec(function (err, blogs) {
             if (blogs) {
                 //现在留言数为0，数据库里没有存留言数，手动计算留言数
@@ -70,8 +70,8 @@ router.get('/:authorName', function (req, res, next) {
     //先查用户，再查blog
     UserModel.findOne(query, '_id', function (err, user) {
         BlogModel.find({author: user._id})
-        // .populate('author')
-        // .limit(5)
+            .populate('author')
+            // .limit(5)
             .exec(function (err, blogs) {
                 if (blogs) {
                     //现在留言数为0，数据库里没有存留言数，手动计算留言数
@@ -165,35 +165,37 @@ router.post('/:authorName/create', checkLogin, function (req, res, next) {
 router.get('/:authorName/:blogId', function (req, res, next) {
     const blogId = req.params.blogId
     // Promise.all([
-    BlogModel.findOneAndUpdate({_id: blogId}, {$inc: {pv: 1}}, function (err, blog) {
-        if (err) {
-            throw new Error(err)
-        }
-        if (blog) {
-            // 获取文章信息
-            CommentModel.find({blogId: blogId}, function (err, comments) {
-                if (err) {
-                    throw new Error(err)
-                }
-                //为每个blog添加commentsCount属性,待解决
-                blog.commentsCount = comments.length;
-                //转为marked语法
-                comments.map(function (comment) {
-                    comment.content = marked(comment.content)
-                    // return comment
+    BlogModel.findOneAndUpdate({_id: blogId}, {$inc: {pv: 1}})
+        .populate('author')
+        .exec(function (err, blog) {
+            if (err) {
+                throw new Error(err)
+            }
+            if (blog) {
+                // 获取文章信息
+                CommentModel.find({blogId: blogId}, function (err, comments) {
+                    if (err) {
+                        throw new Error(err)
+                    }
+                    //为每个blog添加commentsCount属性,待解决
+                    blog.commentsCount = comments.length;
+                    //转为marked语法
+                    comments.map(function (comment) {
+                        comment.content = marked(comment.content)
+                        // return comment
+                    })
+                    // console.log("xx=====  " + comments)
+                    res.render('blog_details', {
+                        blog: blog,
+                        comments: comments
+                    })
                 })
-                // console.log("xx=====  " + comments)
-                res.render('blog_details', {
-                    blog: blog,
-                    comments: comments
-                })
-            })
 
-        } else {
-            throw new Error('该文章不存在')
-        }
+            } else {
+                throw new Error('该文章不存在')
+            }
 
-    })
+        })
     // // 获取文章信息
     // CommentModel.findById(blogId,function (err,xx) {
     //     console.log(xx)

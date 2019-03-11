@@ -15,7 +15,8 @@
 
         <div class="eight wide column">
             <div class="ui segment">
-                <h3><a href="/blog/<%= user.name %>/<%= blog._id %>"><%= blog.title %></a></h3>
+                <!--ssss-->
+                <h3><a href="/blog/<%= blog.author.name %>/<%= blog._id %>"><%= blog.title %></a></h3>
                 <pre><%- blog.content %></pre>
                 <div>
                     <span class="tag"><%= blog.created_at %></span>
