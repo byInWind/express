@@ -27,6 +27,7 @@ router.post('/', checkLogin, function (req, res, next) {
     }
 
     CommentModel.create(comment, function (err, data) {
+        console.log(data)
         //查找blog，更新commentsCount
         BlogModel.findById(blogId, function (err, blog) {
             CommentModel.find({blogId: blogId}, function (err, blogs) {

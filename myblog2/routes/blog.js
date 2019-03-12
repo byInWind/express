@@ -5,6 +5,8 @@ const CommentModel = require('../lib/mongo').Comment
 const UserModel = require('../lib/mongo').User
 const marked = require('marked')
 
+const moment = require('moment')
+
 const checkLogin = require('../middlewares/check').checkLogin
 
 // GET /blog 所有blog
@@ -105,8 +107,11 @@ router.get('/:authorName/:blogId', function (req, res) {
                     }
                     //转为marked语法
                     comments.map(function (comment) {
-                        comment.content = marked(comment.content)
-                    })
+                        comment.content = marked(comment.content);
+                        //难过的哭泣，网上都没查到，mongoose的timestamps,createdAt无法格式化，即在模版里展示默认的createdAt,怎么格式化都无效
+                        //这里另设了一个属性，才实现
+                        comment.created_at = moment(comment.created_at).format('YYYY-MM-DD HH:mm')
+                    });
                     res.render('blog_details', {
                         blog: blog,
                         comments: comments
@@ -184,7 +189,6 @@ router.get('/:authorName/:blogId/remove', checkLogin, function (req, res, next) 
             if (err) {
                 throw new Error(err)
             }
-            console.log(blog)
             if (blog.author._id.toString() !== author.toString()) {
                 throw new Error('没有权限')
             }
@@ -193,5 +197,5 @@ router.get('/:authorName/:blogId/remove', checkLogin, function (req, res, next) 
             res.redirect(`/blog/${authorName}`)
         })
 })
- 
+
 module.exports = router
