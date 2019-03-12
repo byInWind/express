@@ -193,5 +193,5 @@ router.get('/:authorName/:blogId/remove', checkLogin, function (req, res, next) 
             res.redirect(`/blog/${authorName}`)
         })
 })
-
+ 
 module.exports = router
