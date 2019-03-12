@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-
+const BlogModel = require('../lib/mongo').Blog
 const checkLogin = require('../middlewares/check').checkLogin
 const CommentModel = require('../lib/mongo').Comment
 
@@ -27,14 +27,22 @@ router.post('/', checkLogin, function (req, res, next) {
     }
 
     CommentModel.create(comment, function (err, data) {
-        req.flash('success', '留言成功')
-        // 留言成功后跳转到上一页
-        res.redirect('back')
+        //查找blog，更新commentsCount
+        BlogModel.findById(blogId, function (err, blog) {
+            CommentModel.find({blogId: blogId}, function (err, blogs) {
+                blog.commentsCount = blogs.length;
+                BlogModel.updateOne({_id: blogId}, {commentsCount: blog.commentsCount}, function (err, data) {
+                    req.flash('success', '留言成功')
+                    // 留言成功后跳转到上一页
+                    res.redirect('back')
+                })
+            });
+        });
     })
 })
 
 // GET /comments/:commentId/remove 删除一条留言
-router.get('/:commentId/remove', checkLogin, function (req, res, next) {
+router.get('/:commentId/remove', checkLogin, function (req, res) {
     const commentId = req.params.commentId
     const author = req.session.user._id
 
@@ -45,10 +53,19 @@ router.get('/:commentId/remove', checkLogin, function (req, res, next) {
         if (comment.author.toString() !== author.toString()) {
             throw new Error('没有权限删除留言')
         }
+        var blogId = comment.blogId;
         CommentModel.deleteOne({_id: comment}, function () {
-            req.flash('success', '删除留言成功')
-            // 删除成功后跳转到上一页
-            res.redirect('back')
+            //查找blog，更新commentsCount
+            BlogModel.findById(blogId, function (err, blog) {
+                CommentModel.find({blogId: blogId}, function (err, blogs) {
+                    blog.commentsCount = blogs.length;
+                    BlogModel.updateOne({_id: blogId}, {commentsCount: blog.commentsCount}, function (err) {
+                        req.flash('success', '删除留言成功')
+                        // 删除成功后跳转到上一页
+                        res.redirect('back')
+                    })
+                });
+            });
         })
     })
 })

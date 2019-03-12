@@ -38,7 +38,8 @@ var BlogSchema = new Schema({
     author: {type: Schema.Types.ObjectId, ref: 'User', required: true},
     title: {type: 'string', required: true},
     content: {type: 'string', required: true},
-    pv: {type: 'number', default: 0}
+    pv: {type: 'number', default: 0},
+    commentsCount: {type: 'number', default: 0}
 });
 BlogSchema.index({name: 1}, {unique: true});
 exports.Blog = mongoose.model('Blog', BlogSchema);
