@@ -1,5 +1,5 @@
 ## node-express
-学习自https://github.com/nswbmw/N-blog,使用 Express + MongoDB 搭建博客  
+学习自https://github.com/nswbmw/N-blog,使用 Express + MongoDB 搭建博客   
 
 + 改为更流行的Mongoose操作数据库的形式
 + 访问时改为更常见的用户名形式  /blog/用户名/blog
