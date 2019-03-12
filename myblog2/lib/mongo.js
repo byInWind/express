@@ -15,9 +15,6 @@ UserSchema.index({name: 1}, {unique: true});
 exports.User = mongoose.model('User', UserSchema);
 
 // 1与-1是升序降序规则  根据用户名找到用户，用户名全局唯一
-
-// 根据 id 生成创建时间 created_at
-
 var BlogSchema = new Schema({
     author: {type: Schema.Types.ObjectId, ref: 'User', required: true},
     title: {type: 'string', required: true},

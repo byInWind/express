@@ -6,8 +6,6 @@ const flash = require('connect-flash')
 const config = require('config-lite')(__dirname)
 const routes = require('./routes')
 const pkg = require('./package')
-const winston = require('winston')
-const expressWinston = require('express-winston')
 const app = express()
 
 // 设置模板目录
@@ -52,31 +50,8 @@ app.use(function (req, res, next) {
 })
 
 // 正常请求的日志
-// app.use(expressWinston.logger({
-//     transports: [
-//         new (winston.transports.Console)({
-//             json: true,
-//             colorize: true
-//         }),
-//         new winston.transports.File({
-//             filename: 'logs/success.log'
-//         })
-//     ]
-// }))
 // 路由
 routes(app)
-// 错误请求的日志
-// app.use(expressWinston.errorLogger({
-//     transports: [
-//         new winston.transports.Console({
-//             json: true,
-//             colorize: true
-//         }),
-//         new winston.transports.File({
-//             filename: 'logs/error.log'
-//         })
-//     ]
-// }))
 //将错误信息用页面通知展示
 app.use(function (err, req, res, next) {
     console.error(err)
@@ -85,6 +60,6 @@ app.use(function (err, req, res, next) {
 })
 
 // 监听端口，启动程序
-app.listen(3001, function () {
+app.listen(config.port, function () {
     console.log(`${pkg.name} listening on port ${config.port}`)
 })
